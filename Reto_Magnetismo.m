@@ -9,6 +9,7 @@
 
 
 % Parámetros de entrada
+n = 5;
 f1 = @(x) (x.^2);
 
 a1 = -1;
@@ -25,10 +26,10 @@ b2 = 2*pi;
 % integral(f2,a2,b2)
 %[r2,tiempoIntegral2] = getFunction(a2,b2,f2,n)
 
-I = -1;
+I = 1;
 R = 5;
 x = 0;
-y = 10;
+y = 0;
 z = 0;
 
 [campo,tiempo] = getCampoMagnetico(I, R, n, x, y, z);
@@ -37,8 +38,8 @@ disp("Valor de Campo Magnético B = " + campo(1) + "i " + campo(2) + "j " + camp
 
 tic
 % Parámetros de entrada
-I = 1;  % Corriente
-R = 5;  % Radio del bucle
+I = 4;  % Corriente
+R = 9;  % Radio del bucle
 n = 100;  % Número de puntos en la integral
 
 % Valores de x, y, z para los que se calculará el campo magnético
@@ -55,7 +56,7 @@ By = zeros(size(Y));
 Bz = zeros(size(Z));
 
 % Calcular el campo magnético en cada punto de la cuadrícula
-for i = 1:numel(Y)
+for i = 1:numel(X)
     campo_i = getCampoMagnetico(I, R, n, X(i), Y(i), Z(i));
     Bx(i) = campo_i(1);
     By(i) = campo_i(2);
@@ -64,14 +65,14 @@ end
 
 % Graficar el campo magnético en un gráfico bidimensional
 quiver(Y, Z, By, Bz);
-xlabel('x');
-ylabel('y');
+xlabel('y');
+ylabel('z');
 tiempoGraf = toc;
 % Function definitions
 
 disp("Tiempo total para correr = " + (tiempo + tiempoGraf) + " s");
 if(tiempo < tiempoGraf) 
-    disp("Graficar consumo el tiempo mas grande de: " + tiempoGraf + " s")
+    disp("Graficar consume el tiempo más grande de: " + tiempoGraf + " s")
 end
 
 function [campo,tiempo] = getCampoMagnetico(I, R, n, x, y, z)
