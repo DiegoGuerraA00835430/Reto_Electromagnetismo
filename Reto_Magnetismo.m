@@ -6,8 +6,6 @@
 %Resolver producto cruz entre ambos vectores.
 %Ponerlos en un for para hacer la suma de la integración. 
 %Programar la funcion y ponerle casos de prueba.
-
-
 % Parámetros de entrada
 n = 5;
 f1 = @(x) (x.^2);
@@ -20,12 +18,6 @@ f2 = @(x) sin(x);
 a2 = 0;
 b2 = 2*pi;
 
-%integral(f1,a1,b1)
-%[r1,tiempoIntegral1] =getFunction(a1,b1,f1,n)
-
-% integral(f2,a2,b2)
-%[r2,tiempoIntegral2] = getFunction(a2,b2,f2,n)
-
 I = 1;
 R = 5;
 x = 0;
@@ -35,12 +27,12 @@ z = 0;
 [campo,tiempo] = getCampoMagnetico(I, R, n, x, y, z);
 disp("Valor de Campo Magnético B = " + campo(1) + "i " + campo(2) + "j " + campo(3) + "k");
 
-
 tic
 % Parámetros de entrada
 I = 4;  % Corriente
 R = 9;  % Radio del bucle
 n = 100;  % Número de puntos en la integral
+mu0 = 4 * pi * 10^(-7);
 
 % Valores de x, y, z para los que se calculará el campo magnético
 x = linspace(-10, 10, 40);
@@ -64,18 +56,96 @@ for i = 1:numel(X)
 end
 
 % Graficar el campo magnético en un gráfico bidimensional
+subplot(2, 2, 4);
 quiver(Y, Z, By, Bz);
 xlabel('y');
 ylabel('z');
-tiempoGraf = toc;
-% Function definitions
+title('Campo Magnético en el plano y-z');
+
+% Integración de la fuerza magnética a lo largo del eje z
+fuerza_magnetica = @(z) (3/2) * I * campo(3) * mu0 * R^2 * (z ./ (R^2 + z.^2).^(5/2));
+resultado = integral(fuerza_magnetica, 0, 2*pi);
+
+% Gráfico de la fuerza magnética en función de z
+subplot(2, 2, 3);
+z_values = linspace(0, 2*pi, 100);
+fuerza_values = fuerza_magnetica(z_values);
+plot(z_values, fuerza_values);
+xlabel('z');
+ylabel('Fuerza Magnética');
+title('Fuerza Magnética en función de z');
+
+% ecuacion de movimiento
+I = 4; % Corriente
+miu = 1; % Constante
+mu0 = 4*pi*10^(-7); % Permeabilidad magnética del vacío
+R = 9; % Radio del bucle
+m = 1; % Masa de la góndola
+g = 9.8; % Aceleración debido a la gravedad
+
+% Parámetros de integración
+dt = 0.01; % Paso de tiempo
+t_final = 10; %
+% Tiempo final
+
+% Condiciones iniciales
+z0 = 1; % Posición inicial
+v0 = 0; % Velocidad inicial
+
+% Vectores para almacenar los resultados
+t = 0:dt:t_final;
+z = zeros(size(t));
+v = zeros(size(t));
+
+% Iteración del método del punto medio
+for i = 1:numel(t)
+    % Actualizar la velocidad a medio paso
+    v_half = v0 + aceleracion(z0, I, miu, mu0, R, m, g) * (dt / 2);
+    
+    % Actualizar la posición
+    z1 = z0 + v_half * dt;
+    
+    % Actualizar la aceleración en el nuevo punto
+    a1 = aceleracion(z1, I, miu, mu0, R, m, g);
+    
+    % Actualizar la velocidad
+    v1 = v_half + a1 * (dt / 2);
+    
+    % Almacenar los resultados
+    z(i) = z1;
+    v(i) = v1;
+    
+    % Actualizar las condiciones iniciales para la siguiente iteración
+    z0 = z1;
+    v0 = v1;
+end
+
+% Gráficas
+subplot(2, 2, 1);
+plot(t, z);
+xlabel('Tiempo');
+ylabel('Posición');
+title('Movimiento de la góndola: Posición vs Tiempo');
+
+subplot(2, 2, 2);
+plot(t, v);
+xlabel('Tiempo');
+ylabel('Velocidad');
+title('Movimiento de la góndola: Velocidad vs Tiempo');
+tiempograf = toc;
 
 disp("Tiempo total para correr = " + (tiempo + tiempoGraf) + " s");
 if(tiempo < tiempoGraf) 
     disp("Graficar consume el tiempo más grande de: " + tiempoGraf + " s")
 end
 
-function [campo,tiempo] = getCampoMagnetico(I, R, n, x, y, z)
+% Función para calcular la aceleración en un punto dado
+function a = aceleracion(z, I, miu, mu0, R, m, g)
+    a = ((3 * I * miu * mu0 * R^2) / (2 * m)) * (z / (R^2 + z^2)^(5/2)) - g;
+end
+
+% Función para calcular el campo magnético en un punto dado
+function [campo, tiempo] = getCampoMagnetico(I, R, n, x, y, z)
     tic
     a = 0;
     b = 2 * pi;
@@ -89,26 +159,11 @@ function [campo,tiempo] = getCampoMagnetico(I, R, n, x, y, z)
         rpuntoMagnitud = norm(rpunto);
         rpuntoMagnitudCubica = rpuntoMagnitud^3;
         ds = [-sin(lim(i)), cos(lim(i)), 0];
-        puntoCruz = ds .* (rpunto / rpuntoMagnitudCubica);
+        puntoCruz = ds .* (rpunto ./ rpuntoMagnitudCubica);
         db = ((mu0 * R * I) / (4 * pi)) * puntoCruz;
         B = B + db;
     end
 
     campo = B;
-    tiempo = toc;
-end
-
-function [valor,tiempo] = getFunction(a,b,f,n)
-    tic
-    lim = linspace(a,b,n);
-    valor = 0;
-    i = 1;
-    dx = (b-a)/n;
-    while( i<=n)
-        
-        valor = valor + (f(lim(i)) * dx);
-        i = i + 1;
-       
-    end
     tiempo = toc;
 end
