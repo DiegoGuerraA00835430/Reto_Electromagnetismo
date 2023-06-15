@@ -89,7 +89,7 @@ t_final = 10; %
 % Tiempo final
 
 % Condiciones iniciales
-z0 = 1; % Posición inicial
+z0 = 115; % Posición inicial
 v0 = 0; % Velocidad inicial
 
 % Vectores para almacenar los resultados
@@ -126,6 +126,8 @@ plot(t, z);
 xlabel('Tiempo');
 ylabel('Posición');
 title('Movimiento de la góndola: Posición vs Tiempo');
+ylim([0 inf])
+
 
 subplot(2, 2, 2);
 plot(t, v);
@@ -133,6 +135,7 @@ xlabel('Tiempo');
 ylabel('Velocidad');
 title('Movimiento de la góndola: Velocidad vs Tiempo');
 tiempograf = toc;
+
 
 disp("Tiempo total para correr = " + (tiempo + tiempoGraf) + " s");
 if(tiempo < tiempoGraf) 
