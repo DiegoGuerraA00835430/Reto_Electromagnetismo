@@ -7,31 +7,34 @@
 %Ponerlos en un for para hacer la suma de la integración. 
 %Programar la funcion y ponerle casos de prueba.
 % Parámetros de entrada
-n = 5;
-f1 = @(x) (x.^2);
 
-a1 = -1;
-b1 = 1;
-
-f2 = @(x) sin(x);
-
-a2 = 0;
-b2 = 2*pi;
-
-I = 1;
-R = 5;
+% ecuacion de movimiento
+I = 10; % Corriente
+miu = 1; % Constante
+mu0 = 4*pi*10^(-7); % Permeabilidad magnética del vacío
+R = 9; % Radio del bucle
+m = 6418; % Masa de la góndola
+g = 9.8; % Aceleración debido a la gravedad
+n = 100;
 x = 0;
 y = 0;
 z = 0;
+
+
+% Parámetros de integración
+dt = 0.01; % Paso de tiempo
+t_final = 10; %
+% Tiempo final
+
+% Condiciones iniciales
+z0 = 115; % Posición inicial
+v0 = 0; % Velocidad inicial
 
 [campo,tiempo] = getCampoMagnetico(I, R, n, x, y, z);
 disp("Valor de Campo Magnético B = " + campo(1) + "i " + campo(2) + "j " + campo(3) + "k");
 
 tic
 % Parámetros de entrada
-I = 4;  % Corriente
-R = 9;  % Radio del bucle
-n = 100;  % Número de puntos en la integral
 mu0 = 4 * pi * 10^(-7);
 
 % Valores de x, y, z para los que se calculará el campo magnético
@@ -68,29 +71,13 @@ resultado = integral(fuerza_magnetica, 0, 2*pi);
 
 % Gráfico de la fuerza magnética en función de z
 subplot(2, 2, 3);
-z_values = linspace(0, 2*pi, 100);
+z_values = linspace(z0, 0, n);
 fuerza_values = fuerza_magnetica(z_values);
 plot(z_values, fuerza_values);
 xlabel('z');
 ylabel('Fuerza Magnética');
 title('Fuerza Magnética en función de z');
 
-% ecuacion de movimiento
-I = 4; % Corriente
-miu = 1; % Constante
-mu0 = 4*pi*10^(-7); % Permeabilidad magnética del vacío
-R = 9; % Radio del bucle
-m = 1; % Masa de la góndola
-g = 9.8; % Aceleración debido a la gravedad
-
-% Parámetros de integración
-dt = 0.01; % Paso de tiempo
-t_final = 10; %
-% Tiempo final
-
-% Condiciones iniciales
-z0 = 115; % Posición inicial
-v0 = 0; % Velocidad inicial
 
 % Vectores para almacenar los resultados
 t = 0:dt:t_final;
@@ -137,14 +124,14 @@ title('Movimiento de la góndola: Velocidad vs Tiempo');
 tiempograf = toc;
 
 
-disp("Tiempo total para correr = " + (tiempo + tiempoGraf) + " s");
-if(tiempo < tiempoGraf) 
-    disp("Graficar consume el tiempo más grande de: " + tiempoGraf + " s")
-end
+%disp("Tiempo total para correr = " + (tiempo + tiempoGraf) + " s");
+%if(tiempo < tiempoGraf) 
+%    disp("Graficar consume el tiempo más grande de: " + tiempoGraf + " s")
+%end
 
 % Función para calcular la aceleración en un punto dado
 function a = aceleracion(z, I, miu, mu0, R, m, g)
-    a = ((3 * I * miu * mu0 * R^2) / (2 * m)) * (z / (R^2 + z^2)^(5/2)) - g;
+    a = ((3 * I * miu * mu0 * R^2) / (2 * m)) * (z / ((R^2 + z^2)^(5/2))) - g;
 end
 
 % Función para calcular el campo magnético en un punto dado
